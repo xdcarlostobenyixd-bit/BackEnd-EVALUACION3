@@ -1,7 +1,7 @@
-import re
 from django import forms
 from django.core.exceptions import ValidationError
 from .models import Contacto
+from .validators import normalize_email, normalize_telefono
 
 class ContactoForm(forms.ModelForm):
     class Meta:
@@ -39,12 +39,7 @@ class ContactoForm(forms.ModelForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if email:
-            email = email.lower().strip()
-            
-            # Verificar formato general de correo
-            patron_email = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-            if not re.match(patron_email, email):
-                raise ValidationError("Ingresa un correo electrónico válido (ejemplo: usuario@dominio.com).")
+            email = normalize_email(email)
 
             # Verificar si el correo ya está registrado por otro contacto
             query = Contacto.objects.filter(email=email)
@@ -60,13 +55,5 @@ class ContactoForm(forms.ModelForm):
     def clean_telefono(self):
         telefono = self.cleaned_data.get('telefono')
         if telefono:
-            # Eliminar espacios en blanco
-            telefono = telefono.strip().replace(" ", "")
-
-            
-            patron_telefono = r'^(\+?56)?(\d{9})$'
-            
-            if not re.match(patron_telefono, telefono):
-                raise ValidationError("El teléfono debe tener un formato válido (Ej: +56912345678 o 912345678).")
-
+            telefono = normalize_telefono(telefono)
         return telefono

@@ -17,6 +17,9 @@ def lista_contactos(request):
 
     return render(request, 'contactos/lista_contactos.html', {'page_obj': page_obj, 'query': query})
 
+def cliente_api(request):
+    return render(request, 'contactos/cliente_api.html')
+
 def crear_contacto(request):
     if request.method == 'POST':
         form = ContactoForm(request.POST)
